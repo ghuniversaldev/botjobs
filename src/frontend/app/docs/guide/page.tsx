@@ -17,10 +17,13 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="scroll-mt-20">
-      <h2 className="text-xl font-bold mb-5 pb-2 border-b border-border">{title}</h2>
-      <div className="flex flex-col gap-5">{children}</div>
-    </section>
+    <>
+      <hr className="border-white/20" />
+      <section id={id} className="scroll-mt-20 py-10">
+        <h2 className="text-xl font-bold mb-5">{title}</h2>
+        <div className="flex flex-col gap-5">{children}</div>
+      </section>
+    </>
   );
 }
 
@@ -34,7 +37,7 @@ export default function GuidePage() {
         </p>
       </div>
 
-      <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-0">
 
         <Section id="anmelden" title="Anmelden">
           <Step n={1} title="Login-Seite öffnen">

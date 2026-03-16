@@ -5,12 +5,13 @@ import { JobFilters } from "@/components/jobs/JobFilters";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase-server";
 
 interface Props {
   searchParams: Promise<{ status?: string }>;
 }
 
-async function JobList({ status }: { status?: string }) {
+async function JobList({ status, currentUserId }: { status?: string; currentUserId?: string }) {
   let jobs = [];
   try {
     jobs = await api.jobs.list(status === "all" ? undefined : status);
@@ -31,9 +32,12 @@ async function JobList({ status }: { status?: string }) {
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {jobs.map((job) => (
-        <JobCard key={job.id} job={job} />
+    <div className="flex flex-col">
+      {jobs.map((job, i) => (
+        <div key={job.id}>
+          {i > 0 && <hr className="border-white/20" />}
+          <JobCard job={job} currentUserId={currentUserId} />
+        </div>
       ))}
     </div>
   );
@@ -41,6 +45,8 @@ async function JobList({ status }: { status?: string }) {
 
 export default async function JobsPage({ searchParams }: Props) {
   const { status } = await searchParams;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
@@ -63,13 +69,13 @@ export default async function JobsPage({ searchParams }: Props) {
       </div>
 
       <Suspense fallback={
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="flex flex-col gap-2">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="h-48 rounded-xl bg-muted animate-pulse" />
           ))}
         </div>
       }>
-        <JobList status={status} />
+        <JobList status={status} currentUserId={user?.id} />
       </Suspense>
     </main>
   );

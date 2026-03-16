@@ -7,7 +7,30 @@ import { ActiveTasks } from "@/components/dashboard/ActiveTasks";
 import { RegisterBotForm } from "@/components/dashboard/RegisterBotForm";
 import { ReportCards } from "@/components/dashboard/ReportCards";
 import { ActivityLogPanel } from "@/components/dashboard/ActivityLogPanel";
-import { Separator } from "@/components/ui/separator";
+
+function Panel({ title, children }: { title?: string; children: React.ReactNode }) {
+  return (
+    <div style={{
+      border: "1px solid hsl(var(--border))",
+      borderRadius: "0.75rem",
+      padding: "1.5rem",
+      display: "flex",
+      flexDirection: "column",
+      gap: "1.25rem",
+    }}>
+      {title && <h2 className="text-base font-semibold">{title}</h2>}
+      {children}
+    </div>
+  );
+}
+
+const METRICS_FALLBACK = (
+  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "0.75rem" }}>
+    {[...Array(4)].map((_, i) => (
+      <div key={i} style={{ height: "5.5rem", borderRadius: "0.75rem", background: "hsl(var(--muted))" }} />
+    ))}
+  </div>
+);
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -23,33 +46,50 @@ export default async function DashboardPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
-      <div className="mb-6">
+
+      {/* Header */}
+      <div className="mb-8">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-1">Willkommen, {username}</p>
       </div>
 
-      {/* Metrics */}
-      <Suspense fallback={<div className="h-24 rounded-xl bg-muted animate-pulse" />}>
+      {/* Kennzahlen */}
+      <Suspense fallback={METRICS_FALLBACK}>
         <ReportCards token={token} />
       </Suspense>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-3">
-        {/* Left column */}
-        <div className="lg:col-span-2 flex flex-col gap-8">
-          <MyJobs token={token} />
-          <Separator />
-          <MyBots token={token} userId={user.id} />
-          <Separator />
-          <ActiveTasks token={token} />
-          <Separator />
-          <ActivityLogPanel token={token} />
+      <hr className="border-white/20 my-8" />
+
+      {/* Hauptbereich — 3 Spalten */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.5rem", alignItems: "start" }}>
+
+        {/* Spalte 1: Jobs & Tasks */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          <Panel>
+            <MyJobs token={token} />
+          </Panel>
+          <Panel>
+            <ActiveTasks token={token} />
+          </Panel>
         </div>
 
-        {/* Right column */}
-        <div>
-          <RegisterBotForm />
+        {/* Spalte 2: Bots & Aktivitäten */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          <Panel>
+            <MyBots token={token} userId={user.id} />
+          </Panel>
+          <Panel>
+            <ActivityLogPanel token={token} />
+          </Panel>
         </div>
+
+        {/* Spalte 3: Bot registrieren */}
+        <Panel>
+          <RegisterBotForm />
+        </Panel>
+
       </div>
+
     </main>
   );
 }

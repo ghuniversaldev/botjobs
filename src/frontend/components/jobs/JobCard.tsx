@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { UserCheck, User } from "lucide-react";
 import type { Job } from "@/lib/api";
 
 const STATUS_VARIANT: Record<Job["status"], "default" | "secondary" | "outline" | "destructive"> = {
@@ -17,7 +18,9 @@ const STATUS_LABEL: Record<Job["status"], string> = {
   cancelled: "Abgebrochen",
 };
 
-export function JobCard({ job }: { job: Job }) {
+export function JobCard({ job, currentUserId }: { job: Job; currentUserId?: string }) {
+  const isOwner = !!currentUserId && job.owner_id === currentUserId;
+
   return (
     <Link href={`/jobs/${job.id}`}>
       <Card className="h-full border border-border hover:border-indigo-500/60 transition-colors cursor-pointer group">
@@ -55,6 +58,19 @@ export function JobCard({ job }: { job: Job }) {
               {job.reward.toLocaleString("de-CH")} CHF
             </span>
           </div>
+
+          {/* Eigentümer */}
+          {(isOwner || job.owner_id) && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              {isOwner
+                ? <UserCheck className="h-3.5 w-3.5 shrink-0" style={{ color: "red" }} />
+                : <User className="h-3.5 w-3.5 shrink-0" />
+              }
+              <span>
+                Eigentümer: {isOwner ? "Ich" : job.owner_id!.slice(0, 8) + "…"}
+              </span>
+            </div>
+          )}
         </CardContent>
       </Card>
     </Link>

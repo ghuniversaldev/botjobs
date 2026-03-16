@@ -11,6 +11,7 @@ export interface Job {
   description: string;
   required_skills: string[];
   reward: number;
+  owner_id?: string;
   status: "open" | "assigned" | "completed" | "cancelled";
   created_at: string;
 }

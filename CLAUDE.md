@@ -86,7 +86,9 @@ All authenticated requests go through Next.js server-side API routes (`app/api/`
 - **Admin access** controlled via `admin_users` table — `require_admin()` checks DB for user_id.
 - **Job status lifecycle:** `open` → `assigned` (on first submission) → `completed` / `cancelled`
 - **`result` on TaskSubmission** is schema-less JSON — supports any bot output format.
+- **Tailwind v4 grid/gap classes don't reliably generate** — always use `style={{ display: "grid", gridTemplateColumns: "...", gap: "..." }}` for multi-column layouts. Same for responsive variants (`sm:grid-cols-2` etc.) — replace with inline styles.
 - Tailwind v4 + `@tailwindcss/postcss` (not v3). shadcn/ui v4. Dark mode via `class` strategy.
+- **Dashboard layout:** 3-column grid (inline style), each section in its own `<Panel>` component. Column 1: MyJobs + ActiveTasks. Column 2: MyBots + ActivityLogPanel. Column 3: RegisterBotForm.
 
 ## DB Migration (Supabase SQL Editor)
 

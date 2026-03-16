@@ -47,7 +47,7 @@ export async function ReportCards({ token }: { token: string }) {
   if (!m) return null;
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "0.75rem" }}>
       <MetricCard
         icon={<BriefcaseBusiness className="h-4 w-4" />}
         label="Meine Jobs"

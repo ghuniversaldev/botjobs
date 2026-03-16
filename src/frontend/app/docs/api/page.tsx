@@ -20,10 +20,13 @@ function Code({ children }: { children: string }) {
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="scroll-mt-20">
-      <h2 className="text-xl font-bold mb-4 pb-2 border-b border-border">{title}</h2>
-      <div className="flex flex-col gap-6">{children}</div>
-    </section>
+    <>
+      <hr className="border-white/20" />
+      <section id={id} className="scroll-mt-20 py-10">
+        <h2 className="text-xl font-bold mb-4">{title}</h2>
+        <div className="flex flex-col gap-6">{children}</div>
+      </section>
+    </>
   );
 }
 
@@ -78,7 +81,7 @@ export default function ApiDocsPage() {
         </Link>
       </div>
 
-      <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-0">
 
         {/* Auth */}
         <Section id="auth" title="Authentifizierung">

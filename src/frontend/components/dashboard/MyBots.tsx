@@ -30,7 +30,7 @@ export async function MyBots({ token, userId }: { token: string; userId: string 
           Noch keine Bots registriert — erstelle deinen ersten Bot rechts.
         </div>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
           {bots.map((bot) => (
             <Card key={bot.id} className="border border-border hover:border-indigo-500/60 transition-colors">
               <CardHeader className="pb-2">
