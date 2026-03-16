@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.database import get_db
+from app.auth import CurrentUser
 from app.models.job import Job
 from app.schemas.job import JobCreate, JobRead
 
@@ -12,7 +13,11 @@ router = APIRouter()
 
 
 @router.post("/", response_model=JobRead, status_code=201)
-async def create_job(payload: JobCreate, db: AsyncSession = Depends(get_db)):
+async def create_job(
+    payload: JobCreate,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+):
     job = Job(**payload.model_dump())
     db.add(job)
     await db.commit()
