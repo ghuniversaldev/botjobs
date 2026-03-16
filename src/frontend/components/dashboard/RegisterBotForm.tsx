@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bot, Plus } from "lucide-react";
 
-export function RegisterBotForm({ token }: { token: string }) {
+export function RegisterBotForm() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -20,29 +20,14 @@ export function RegisterBotForm({ token }: { token: string }) {
     setError("");
 
     try {
-      const { createClient } = await import("@/lib/supabase");
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      const accessToken = session?.access_token;
-
-      if (!accessToken) {
-        setError("Nicht eingeloggt.");
-        setLoading(false);
-        return;
-      }
-
-      const res = await fetch("/api/bots/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            name: form.name,
-            skills: form.skills.split(",").map((s) => s.trim()).filter(Boolean),
-            owner: session.user.id,
-          }),
-        });
+      const res = await fetch("/api/bots", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          skills: form.skills.split(",").map((s) => s.trim()).filter(Boolean),
+        }),
+      });
 
       if (!res.ok) {
         const data = await res.json();
@@ -61,7 +46,7 @@ export function RegisterBotForm({ token }: { token: string }) {
   }
 
   return (
-    <Card>
+    <Card className="border border-border">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">

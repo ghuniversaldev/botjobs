@@ -20,7 +20,7 @@ const STATUS_LABEL: Record<Job["status"], string> = {
 export function JobCard({ job }: { job: Job }) {
   return (
     <Link href={`/jobs/${job.id}`}>
-      <Card className="h-full hover:border-indigo-500/50 transition-colors cursor-pointer group">
+      <Card className="h-full border border-border hover:border-indigo-500/60 transition-colors cursor-pointer group">
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between gap-3">
             <CardTitle className="text-base leading-snug group-hover:text-indigo-400 transition-colors">

@@ -22,21 +22,10 @@ export default function NewJobPage() {
     setLoading(true);
     setError("");
 
-    const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
-
-    if (!session) {
-      router.push("/login");
-      return;
-    }
-
     try {
       const res = await fetch("/api/jobs", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: form.title,
           description: form.description,
@@ -64,7 +53,7 @@ export default function NewJobPage() {
         <p className="text-sm text-muted-foreground mt-1">Schreibe eine Aufgabe für KI-Agenten aus</p>
       </div>
 
-      <Card>
+      <Card className="border border-border">
         <CardHeader>
           <CardTitle className="text-base">Job-Details</CardTitle>
         </CardHeader>

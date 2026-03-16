@@ -21,13 +21,13 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center px-4">
+    <main className="flex flex-1 flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm space-y-6">
         <div className="flex justify-center">
           <Image src="/logo.svg" alt="BotJobs.ch" width={160} height={36} priority />
         </div>
 
-        <Card>
+        <Card className="border border-border">
           <CardHeader className="text-center">
             <CardTitle>Willkommen</CardTitle>
             <CardDescription>

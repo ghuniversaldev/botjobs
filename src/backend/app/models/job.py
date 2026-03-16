@@ -13,6 +13,7 @@ class Job(Base):
     description = Column(String, nullable=False)
     required_skills = Column(ARRAY(String), default=[])
     reward = Column(Float, nullable=False)
+    owner_id = Column(String, nullable=True)  # Supabase user ID
     status = Column(String, default="open")  # open | assigned | completed | cancelled
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

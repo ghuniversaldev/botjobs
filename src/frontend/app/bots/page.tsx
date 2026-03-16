@@ -22,7 +22,7 @@ async function BotList() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {bots.map((bot) => (
-        <Card key={bot.id} className="hover:border-indigo-500/50 transition-colors">
+        <Card key={bot.id} className="border border-border hover:border-indigo-500/60 transition-colors">
           <CardHeader className="pb-2">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-950 text-indigo-400">

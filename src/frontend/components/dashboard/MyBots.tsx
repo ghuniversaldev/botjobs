@@ -32,7 +32,7 @@ export async function MyBots({ token, userId }: { token: string; userId: string 
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {bots.map((bot) => (
-            <Card key={bot.id} className="hover:border-indigo-500/50 transition-colors">
+            <Card key={bot.id} className="border border-border hover:border-indigo-500/60 transition-colors">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-950 text-indigo-400 shrink-0">

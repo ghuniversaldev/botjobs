@@ -1,6 +1,6 @@
 from uuid import UUID
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
@@ -13,6 +13,7 @@ class JobCreate(BaseModel):
 
 class JobRead(JobCreate):
     id: UUID
+    owner_id: Optional[str] = None
     status: str
     created_at: datetime
 

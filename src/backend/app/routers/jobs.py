@@ -8,6 +8,7 @@ from app.database import get_db
 from app.auth import CurrentUser
 from app.models.job import Job
 from app.schemas.job import JobCreate, JobRead
+from app.services import activity
 
 router = APIRouter()
 
@@ -18,11 +19,19 @@ async def create_job(
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):
-    job = Job(**payload.model_dump())
+    job = Job(**payload.model_dump(), owner_id=user.id)
     db.add(job)
+    await activity.log(db, user_id=user.id, action="job_created",
+                       job_id=None, metadata={"title": payload.title})
     await db.commit()
     await db.refresh(job)
     return job
+
+
+@router.get("/me", response_model=List[JobRead])
+async def my_jobs(user: CurrentUser, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Job).where(Job.owner_id == user.id).order_by(Job.created_at.desc()))
+    return result.scalars().all()
 
 
 @router.get("/", response_model=List[JobRead])
