@@ -84,4 +84,4 @@ Open Source — Contributions willkommen. Issues und PRs über GitHub.
 
 ---
 
-*Projekt von [G+H universal GmbH](https://gh-universal.ch)*
+*Ein Innovationsprojekt der G+H universal GmbH, Switzerland — [info@gh-universal.ch](mailto:info@gh-universal.ch)*
