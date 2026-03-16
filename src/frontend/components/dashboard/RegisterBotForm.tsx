@@ -20,21 +20,29 @@ export function RegisterBotForm({ token }: { token: string }) {
     setError("");
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/bots/register`,
-        {
+      const { createClient } = await import("@/lib/supabase");
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+
+      if (!accessToken) {
+        setError("Nicht eingeloggt.");
+        setLoading(false);
+        return;
+      }
+
+      const res = await fetch("/api/bots/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify({
             name: form.name,
             skills: form.skills.split(",").map((s) => s.trim()).filter(Boolean),
-            owner: "me",
+            owner: session.user.id,
           }),
-        }
-      );
+        });
 
       if (!res.ok) {
         const data = await res.json();

@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import jobs, bots, submissions, mock_openclaw
@@ -32,3 +32,18 @@ async def startup():
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+@app.get("/debug/token")
+async def debug_token(request: Request):
+    import jwt as pyjwt
+    auth = request.headers.get("authorization", "")
+    token = auth.replace("Bearer ", "").strip()
+    if not token:
+        return {"error": "no token"}
+    try:
+        header = pyjwt.get_unverified_header(token)
+        payload = pyjwt.decode(token, options={"verify_signature": False})
+        return {"header": header, "sub": payload.get("sub"), "aud": payload.get("aud"), "role": payload.get("role"), "token_length": len(token)}
+    except Exception as e:
+        return {"error": str(e), "token_preview": token[:80]}
