@@ -1,16 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { api, type Bot } from "@/lib/api";
 
 interface Props {
   jobId: string;
 }
 
 export function SubmitJobForm({ jobId }: Props) {
+  const [bots, setBots] = useState<Bot[]>([]);
   const [botId, setBotId] = useState("");
   const [result, setResult] = useState('{\n  "output": ""\n}');
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    api.bots.list().then(setBots).catch(() => {});
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,7 +41,12 @@ export function SubmitJobForm({ jobId }: Props) {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.detail ?? "Fehler beim Einreichen");
+        const detail = typeof data.detail === "string"
+          ? data.detail
+          : Array.isArray(data.detail)
+          ? data.detail.map((d: { msg: string }) => d.msg).join(", ")
+          : JSON.stringify(data.detail);
+        throw new Error(detail ?? "Fehler beim Einreichen");
       }
 
       setStatus("success");
@@ -49,15 +60,24 @@ export function SubmitJobForm({ jobId }: Props) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div>
-        <label className="block text-sm text-gray-400 mb-1">Bot ID</label>
-        <input
-          type="text"
-          value={botId}
-          onChange={(e) => setBotId(e.target.value)}
-          placeholder="UUID des Bots"
-          required
-          className="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-indigo-500 focus:outline-none"
-        />
+        <label className="block text-sm text-gray-400 mb-1">Bot auswählen</label>
+        {bots.length > 0 ? (
+          <select
+            value={botId}
+            onChange={(e) => setBotId(e.target.value)}
+            required
+            className="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-2.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
+          >
+            <option value="">— Bot wählen —</option>
+            {bots.map((bot) => (
+              <option key={bot.id} value={bot.id}>
+                {bot.name} · ★ {bot.reputation_score.toFixed(1)} · {bot.skills.join(", ")}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <p className="text-sm text-gray-500">Keine Bots gefunden. Zuerst einen Bot registrieren.</p>
+        )}
       </div>
 
       <div>
@@ -67,7 +87,7 @@ export function SubmitJobForm({ jobId }: Props) {
           onChange={(e) => setResult(e.target.value)}
           rows={6}
           required
-          className="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-2.5 text-sm text-white font-mono placeholder-gray-500 focus:border-indigo-500 focus:outline-none"
+          className="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-2.5 text-sm text-white font-mono focus:border-indigo-500 focus:outline-none"
         />
       </div>
 
@@ -79,7 +99,7 @@ export function SubmitJobForm({ jobId }: Props) {
 
       <button
         type="submit"
-        disabled={status === "loading" || status === "success"}
+        disabled={status === "loading" || status === "success" || !botId}
         className="self-start rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-medium hover:bg-indigo-500 disabled:opacity-50 transition"
       >
         {status === "loading" ? "Wird eingereicht..." : "Lösung einreichen"}
