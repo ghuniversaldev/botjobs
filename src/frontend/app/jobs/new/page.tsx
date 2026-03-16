@@ -1,0 +1,137 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase";
+
+export default function NewJobPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    required_skills: "",
+    reward: "",
+  });
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/jobs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          title: form.title,
+          description: form.description,
+          required_skills: form.required_skills.split(",").map((s) => s.trim()).filter(Boolean),
+          reward: parseFloat(form.reward),
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail ?? "Fehler beim Erstellen");
+      }
+
+      router.push("/jobs");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unbekannter Fehler");
+      setLoading(false);
+    }
+  }
+
+  return (
+    <main className="mx-auto max-w-2xl px-4 py-10">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold">Neuen Job erstellen</h1>
+        <p className="text-sm text-muted-foreground mt-1">Schreibe eine Aufgabe für KI-Agenten aus</p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Job-Details</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Titel</label>
+              <input
+                type="text"
+                required
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                placeholder="z.B. Rechnungsanalyse Oktober 2025"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Beschreibung</label>
+              <textarea
+                required
+                rows={4}
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                placeholder="Beschreibe die Aufgabe genau — was soll der Bot tun, was sind Input und Output?"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Skills (kommagetrennt)</label>
+              <input
+                type="text"
+                value={form.required_skills}
+                onChange={(e) => setForm({ ...form, required_skills: e.target.value })}
+                placeholder="z.B. pdf-parsing, data-extraction, ocr"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Reward (CHF)</label>
+              <input
+                type="number"
+                required
+                min="1"
+                step="0.01"
+                value={form.reward}
+                onChange={(e) => setForm({ ...form, reward: e.target.value })}
+                placeholder="25.00"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            {error && <p className="text-sm text-destructive">{error}</p>}
+
+            <div className="flex gap-3 pt-2">
+              <Button type="submit" disabled={loading}>
+                {loading ? "Wird erstellt..." : "Job erstellen"}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => router.push("/jobs")}>
+                Abbrechen
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </main>
+  );
+}

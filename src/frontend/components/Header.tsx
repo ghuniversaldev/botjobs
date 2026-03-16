@@ -44,7 +44,7 @@ export function Header() {
 
         {/* Logo */}
         <Link href="/jobs" className="flex items-center gap-2">
-          <Image src="/logo.svg" alt="BotJobs.ch" width={140} height={32} priority />
+          <Image src="/logo.svg" alt="BotJobs.ch" width={200} height={48} priority />
         </Link>
 
         {/* Nav */}
@@ -71,10 +71,10 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="flex items-center gap-2 px-2">
                 <Avatar className="h-7 w-7">
-                  <AvatarImage src={avatarUrl} />
-                  <AvatarFallback className="text-xs bg-indigo-900 text-indigo-300">
-                    {initials}
-                  </AvatarFallback>
+                  {avatarUrl
+                    ? <Image src={avatarUrl} alt={username} width={28} height={28} className="rounded-full" />
+                    : <AvatarFallback className="text-xs bg-indigo-900 text-indigo-300">{initials}</AvatarFallback>
+                  }
                 </Avatar>
                 <span className="hidden sm:block text-sm text-muted-foreground max-w-[120px] truncate">
                   {username}

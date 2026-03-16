@@ -4,6 +4,7 @@ import { JobCard } from "@/components/jobs/JobCard";
 import { JobFilters } from "@/components/jobs/JobFilters";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
+import Link from "next/link";
 
 interface Props {
   searchParams: Promise<{ status?: string }>;
@@ -52,9 +53,11 @@ export default async function JobsPage({ searchParams }: Props) {
           <Suspense>
             <JobFilters />
           </Suspense>
-          <Button size="sm" className="flex items-center gap-1.5">
-            <PlusCircle className="h-4 w-4" />
-            Job erstellen
+          <Button size="sm" className="flex items-center gap-1.5" asChild>
+            <Link href="/jobs/new">
+              <PlusCircle className="h-4 w-4" />
+              Job erstellen
+            </Link>
           </Button>
         </div>
       </div>
