@@ -1,8 +1,14 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
-const STATUSES = ["all", "open", "assigned", "completed"] as const;
+const STATUSES = [
+  { value: "all",       label: "Alle" },
+  { value: "open",      label: "Offen" },
+  { value: "assigned",  label: "Vergeben" },
+  { value: "completed", label: "Abgeschlossen" },
+] as const;
 
 export function JobFilters() {
   const router = useRouter();
@@ -10,24 +16,20 @@ export function JobFilters() {
   const current = params.get("status") ?? "all";
 
   function setStatus(status: string) {
-    const url = status === "all" ? "/jobs" : `/jobs?status=${status}`;
-    router.push(url);
+    router.push(status === "all" ? "/jobs" : `/jobs?status=${status}`);
   }
 
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2">
       {STATUSES.map((s) => (
-        <button
-          key={s}
-          onClick={() => setStatus(s)}
-          className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-            current === s
-              ? "bg-indigo-600 text-white"
-              : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-          }`}
+        <Button
+          key={s.value}
+          size="sm"
+          variant={current === s.value ? "default" : "outline"}
+          onClick={() => setStatus(s.value)}
         >
-          {s.charAt(0).toUpperCase() + s.slice(1)}
-        </button>
+          {s.label}
+        </Button>
       ))}
     </div>
   );
