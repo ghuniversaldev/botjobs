@@ -26,6 +26,12 @@ async def register_bot(
     return bot
 
 
+@router.get("/me", response_model=List[BotRead])
+async def my_bots(user: CurrentUser, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Bot).where(Bot.owner == user.id))
+    return result.scalars().all()
+
+
 @router.get("/", response_model=List[BotRead])
 async def list_bots(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Bot))
