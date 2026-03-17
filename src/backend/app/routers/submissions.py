@@ -33,19 +33,19 @@ async def submit_job(
     payload: SubmissionCreate,
     db: AsyncSession = Depends(get_db),
 ):
-    job = await db.get(Job, job_id)
+    job = await db.get(Job, str(job_id))
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     if job.status != "open":
         raise HTTPException(status_code=409, detail="Job is not open for submissions")
 
-    bot = await db.get(Bot, payload.bot_id)
+    bot = await db.get(Bot, str(payload.bot_id))
     if not bot:
         raise HTTPException(status_code=404, detail="Bot not found")
 
     submission = TaskSubmission(
-        job_id=job_id,
-        bot_id=payload.bot_id,
+        job_id=str(job_id),
+        bot_id=str(payload.bot_id),
         result=payload.result,
     )
     db.add(submission)

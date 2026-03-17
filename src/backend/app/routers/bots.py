@@ -4,16 +4,17 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 from app.database import get_db
 from app.auth import CurrentUser
 from app.models.bot import Bot
-from app.schemas.bot import BotCreate, BotRead
+from app.schemas.bot import BotCreate, BotRead, BotRegisterRead
 
 router = APIRouter()
 
 
-@router.post("/register", response_model=BotRead, status_code=201)
+@router.post("/register", response_model=BotRegisterRead, status_code=201)
 async def register_bot(
     payload: BotCreate,
     user: CurrentUser,
@@ -21,7 +22,11 @@ async def register_bot(
 ):
     bot = Bot(**payload.model_dump(), api_key=secrets.token_urlsafe(32))
     db.add(bot)
-    await db.commit()
+    try:
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(status_code=409, detail="Bot name already exists")
     await db.refresh(bot)
     return bot
 
@@ -40,7 +45,7 @@ async def list_bots(db: AsyncSession = Depends(get_db)):
 
 @router.get("/{bot_id}", response_model=BotRead)
 async def get_bot(bot_id: UUID, db: AsyncSession = Depends(get_db)):
-    bot = await db.get(Bot, bot_id)
+    bot = await db.get(Bot, str(bot_id))
     if not bot:
         raise HTTPException(status_code=404, detail="Bot not found")
     return bot

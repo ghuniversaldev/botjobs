@@ -23,7 +23,7 @@ async def make_offer(
     db: AsyncSession = Depends(get_db),
 ):
     """Bot owner makes an initial price offer for a job."""
-    job = await db.get(Job, job_id)
+    job = await db.get(Job, str(job_id))
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     if job.status != "open":
@@ -68,7 +68,7 @@ async def counter_offer(
     db: AsyncSession = Depends(get_db),
 ):
     """Job owner makes a counter offer."""
-    job = await db.get(Job, job_id)
+    job = await db.get(Job, str(job_id))
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     if job.owner_id != user.id:
@@ -117,7 +117,7 @@ async def accept_negotiation(
         raise HTTPException(status_code=404, detail="No open negotiation found")
 
     neg.status = "accepted"
-    job = await db.get(Job, job_id)
+    job = await db.get(Job, str(job_id))
     if job:
         job.reward = neg.current_price
 

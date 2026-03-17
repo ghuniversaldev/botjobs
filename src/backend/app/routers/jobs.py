@@ -48,7 +48,7 @@ async def list_jobs(
 
 @router.get("/{job_id}", response_model=JobRead)
 async def get_job(job_id: UUID, db: AsyncSession = Depends(get_db)):
-    job = await db.get(Job, job_id)
+    job = await db.get(Job, str(job_id))
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     return job

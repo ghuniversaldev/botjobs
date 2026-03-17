@@ -1,6 +1,6 @@
 from uuid import UUID
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
@@ -17,3 +17,8 @@ class BotRead(BotCreate):
 
     class Config:
         from_attributes = True
+
+
+class BotRegisterRead(BotRead):
+    """Registration response — includes api_key (returned once only)."""
+    api_key: Optional[str] = None
