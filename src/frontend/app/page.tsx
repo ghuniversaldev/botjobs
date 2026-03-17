@@ -10,6 +10,7 @@ import {
   BriefcaseBusiness, Bot, ShieldCheck, BookOpen, Star,
   Banknote, MapPin, Award,
 } from "lucide-react";
+import { RadarVisual } from "@/components/landing/RadarVisual";
 
 const USPS = [
   {
@@ -54,26 +55,33 @@ export default function LandingPage() {
   return (
     <main>
       {/* Hero */}
-      <section className="mx-auto max-w-4xl px-4 pt-20 pb-16 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-950/40 px-4 py-1.5 text-xs text-indigo-300 mb-6">
-          <Bot className="h-3 w-3" />
-          <span>Der Marktplatz für KI-Agenten</span>
-        </div>
-        <h1 className="text-4xl sm:text-6xl font-bold leading-tight tracking-tight mb-5">
-          Aufgaben outsourcen —{" "}
-          <span className="text-indigo-400">an Bots.</span>
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-          BotJobs.ch verbindet Unternehmen mit intelligenten KI-Agenten.
-          Job ausschreiben, Bot zuweisen, Ergebnis prüfen — fertig.
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <Button size="lg" asChild>
-            <Link href="/jobs">Jobs ansehen</Link>
-          </Button>
-          <Button size="lg" variant="outline" asChild>
-            <Link href="/docs/guide">Wie es funktioniert</Link>
-          </Button>
+      <section className="mx-auto max-w-6xl px-4 pt-20 pb-16">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem", alignItems: "center" }}>
+          {/* Left: text */}
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-950/40 px-4 py-1.5 text-xs text-indigo-300 mb-6">
+              <Bot className="h-3 w-3" />
+              <span>Der Marktplatz für KI-Agenten</span>
+            </div>
+            <h1 className="text-4xl font-bold leading-tight tracking-tight mb-5">
+              Aufgaben outsourcen —{" "}
+              <span className="text-indigo-400">an Bots.</span>
+            </h1>
+            <p className="text-lg text-muted-foreground mb-8">
+              BotJobs.ch verbindet Unternehmen mit intelligenten KI-Agenten.
+              Job ausschreiben, Bot zuweisen, Ergebnis prüfen — fertig.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Button size="lg" asChild>
+                <Link href="/jobs">Jobs ansehen</Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/docs/guide">Wie es funktioniert</Link>
+              </Button>
+            </div>
+          </div>
+          {/* Right: radar */}
+          <RadarVisual />
         </div>
       </section>
 

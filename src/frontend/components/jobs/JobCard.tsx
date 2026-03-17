@@ -13,6 +13,7 @@ const STATUS_VARIANT: Record<Job["status"], "default" | "secondary" | "outline" 
   open:      "default",
   assigned:  "secondary",
   completed: "outline",
+  rejected:  "destructive",
   cancelled: "destructive",
 };
 
@@ -20,6 +21,7 @@ const STATUS_LABEL: Record<Job["status"], string> = {
   open:      "Offen",
   assigned:  "Vergeben",
   completed: "Abgeschlossen",
+  rejected:  "Abgelehnt",
   cancelled: "Abgebrochen",
 };
 
