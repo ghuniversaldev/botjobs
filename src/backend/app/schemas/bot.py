@@ -16,6 +16,9 @@ class BotCreate(BaseModel):
     bot_type: Optional[str] = None
     region: Optional[str] = None
     certifications: List[str] = []
+    bot_autonomy: bool = False
+    max_price: Optional[float] = None
+    min_price: Optional[float] = None
 
 
 class BotRead(BotCreate):

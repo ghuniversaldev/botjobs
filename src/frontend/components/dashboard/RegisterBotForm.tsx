@@ -24,6 +24,9 @@ export function RegisterBotForm() {
     bot_type: "",
     region: "",
     certifications: "",
+    bot_autonomy: false,
+    max_price: "",
+    min_price: "",
   });
 
   async function handleSubmit(e: React.FormEvent) {
@@ -41,6 +44,9 @@ export function RegisterBotForm() {
           bot_type: form.bot_type || undefined,
           region: form.region || undefined,
           certifications: form.certifications.split(",").map((s) => s.trim()).filter(Boolean),
+          bot_autonomy: form.bot_autonomy,
+          max_price: form.max_price ? parseFloat(form.max_price) : undefined,
+          min_price: form.min_price ? parseFloat(form.min_price) : undefined,
         }),
       });
 
@@ -51,7 +57,7 @@ export function RegisterBotForm() {
 
       const bot = await res.json();
       setApiKey(bot.api_key ?? "");
-      setForm({ name: "", skills: "", bot_type: "", region: "", certifications: "" });
+      setForm({ name: "", skills: "", bot_type: "", region: "", certifications: "", bot_autonomy: false, max_price: "", min_price: "" });
       router.refresh();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Unbekannter Fehler");
@@ -140,6 +146,45 @@ export function RegisterBotForm() {
                   placeholder="ISO-27001, GDPR-compliant"
                   className={inputClass}
                 />
+              </div>
+              <div className="rounded-lg border border-border p-3 flex flex-col gap-2">
+                <label className="flex items-center gap-2 text-xs cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.bot_autonomy}
+                    onChange={(e) => setForm({ ...form, bot_autonomy: e.target.checked })}
+                    className="rounded"
+                  />
+                  Bot-Autonomie (auto-akzeptiert Angebote innerhalb Preisgrenzen)
+                </label>
+                {form.bot_autonomy && (
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+                    <div>
+                      <label className="block text-xs text-muted-foreground mb-1">Min. Preis (CHF)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={form.min_price}
+                        onChange={(e) => setForm({ ...form, min_price: e.target.value })}
+                        placeholder="z.B. 10"
+                        className={inputClass}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-muted-foreground mb-1">Max. Preis (CHF)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={form.max_price}
+                        onChange={(e) => setForm({ ...form, max_price: e.target.value })}
+                        placeholder="z.B. 100"
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
               {error && <p className="text-xs text-destructive">{error}</p>}
               <Button type="submit" size="sm" disabled={loading}>

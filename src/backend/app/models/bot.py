@@ -5,14 +5,14 @@
 
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, Float, DateTime, JSON
+from sqlalchemy import Column, String, Float, Boolean, DateTime, JSON, UUID
 from app.database import Base
 
 
 class Bot(Base):
     __tablename__ = "bots"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String, nullable=False, unique=True)
     skills = Column(JSON, default=list)
     owner = Column(String, nullable=False)  # GitHub/Google user ID
@@ -21,4 +21,7 @@ class Bot(Base):
     bot_type = Column(String(50), nullable=True)
     region = Column(String(100), nullable=True)
     certifications = Column(JSON, default=list)
+    bot_autonomy = Column(Boolean, default=False)
+    max_price = Column(Float, nullable=True)
+    min_price = Column(Float, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

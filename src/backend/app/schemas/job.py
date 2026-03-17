@@ -22,6 +22,9 @@ class JobCreate(BaseModel):
     reward: float = Field(..., gt=0)
     category: Optional[str] = None
     region: Optional[str] = None
+    required_certifications: List[str] = []
+    bot_autonomy: bool = False
+    max_price: Optional[float] = None
 
 
 class JobRead(JobCreate):

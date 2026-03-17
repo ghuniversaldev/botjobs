@@ -5,14 +5,14 @@
 
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, Float, DateTime, JSON
+from sqlalchemy import Column, String, Float, Boolean, DateTime, JSON, UUID
 from app.database import Base
 
 
 class Job(Base):
     __tablename__ = "jobs"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
     required_skills = Column(JSON, default=list)
@@ -21,7 +21,10 @@ class Job(Base):
     status = Column(String, default="open")  # open | assigned | completed | rejected | cancelled
     category = Column(String(50), nullable=True)
     region = Column(String(100), nullable=True)
+    required_certifications = Column(JSON, default=list)
     assigned_bot_id = Column(String(36), nullable=True)
     assigned_at = Column(DateTime, nullable=True)
+    bot_autonomy = Column(Boolean, default=False)
+    max_price = Column(Float, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

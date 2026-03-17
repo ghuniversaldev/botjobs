@@ -5,14 +5,14 @@
 
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, JSON
+from sqlalchemy import Column, String, DateTime, JSON, UUID
 from app.database import Base
 
 
 class ActivityLog(Base):
     __tablename__ = "activity_logs"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String, nullable=False)
     job_id = Column(String, nullable=True)
     bot_id = Column(String, nullable=True)

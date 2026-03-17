@@ -46,10 +46,8 @@ export default async function JobDetailPage({ params }: Props) {
   }
 
   const supabase = await createClient();
-  const { data: { user, session } } = await supabase.auth.getUser().then(async (u) => {
-    const s = await supabase.auth.getSession();
-    return { data: { user: u.data.user, session: s.data.session } };
-  });
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
 
   const isOwner = !!user && job.owner_id === user.id;
 
@@ -89,8 +87,8 @@ export default async function JobDetailPage({ params }: Props) {
 
       <p className="mt-2 text-sm text-muted-foreground">Erstellt am {createdAt}</p>
 
-      {/* Category + Region badges */}
-      {(job.category || job.region) && (
+      {/* Category / Region / Certifications badges */}
+      {(job.category || job.region || job.required_certifications?.length > 0) && (
         <div className="mt-3 flex flex-wrap gap-2">
           {job.category && (
             <span className="rounded-full border border-indigo-500/30 bg-indigo-950/40 px-3 py-0.5 text-xs text-indigo-300">
@@ -102,6 +100,11 @@ export default async function JobDetailPage({ params }: Props) {
               {job.region}
             </span>
           )}
+          {job.required_certifications?.map((cert) => (
+            <span key={cert} className="rounded-full border border-yellow-500/30 bg-yellow-950/30 px-3 py-0.5 text-xs text-yellow-300">
+              {cert}
+            </span>
+          ))}
         </div>
       )}
 
@@ -145,6 +148,18 @@ export default async function JobDetailPage({ params }: Props) {
         </div>
       )}
 
+      {/* Owner: Bot-Autonomie settings */}
+      {isOwner && (job.status === "open" || job.status === "assigned") && (
+        <div className="mt-10 border-t border-border pt-8">
+          <h2 className="text-lg font-semibold mb-1">Automatisierung</h2>
+          <p className="text-sm text-muted-foreground mb-3">
+            {(job as { bot_autonomy?: boolean }).bot_autonomy
+              ? `✅ Bot-Autonomie aktiv — Angebote bis ${(job as { max_price?: number }).max_price ?? "—"} CHF werden automatisch akzeptiert`
+              : "Bot-Autonomie inaktiv — Angebote müssen manuell geprüft werden"}
+          </p>
+        </div>
+      )}
+
       {/* Owner: Rating after completion */}
       {isOwner && job.status === "completed" && (
         <div className="mt-10 border-t border-border pt-8">
@@ -153,8 +168,8 @@ export default async function JobDetailPage({ params }: Props) {
         </div>
       )}
 
-      {/* Negotiation — open to all logged-in users */}
-      {job.status === "open" && user && (
+      {/* Negotiation — owner sees all negotiations; non-owners can make offers */}
+      {(job.status === "open" || job.status === "assigned") && user && (
         <div className="mt-10 border-t border-border pt-8">
           <h2 className="text-lg font-semibold mb-4">Preisverhandlung</h2>
           <NegotiationPanel jobId={job.id} jobReward={job.reward} isOwner={isOwner} />

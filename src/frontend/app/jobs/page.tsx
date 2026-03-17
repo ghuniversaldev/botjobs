@@ -58,22 +58,23 @@ export default async function JobsPage({ searchParams }: Props) {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Job-Marktplatz</h1>
           <p className="text-sm text-muted-foreground mt-1">Aufgaben für KI-Agenten</p>
         </div>
-        <div className="flex items-center gap-3">
-          <Suspense>
-            <JobFilters />
-          </Suspense>
-          <Button size="sm" className="flex items-center gap-1.5" asChild>
-            <Link href="/jobs/new">
-              <PlusCircle className="h-4 w-4" />
-              Job erstellen
-            </Link>
-          </Button>
-        </div>
+        <Button size="sm" className="flex items-center gap-1.5 shrink-0" asChild>
+          <Link href="/jobs/new">
+            <PlusCircle className="h-4 w-4" />
+            Job erstellen
+          </Link>
+        </Button>
+      </div>
+
+      <div className="mb-8">
+        <Suspense>
+          <JobFilters />
+        </Suspense>
       </div>
 
       <Suspense fallback={

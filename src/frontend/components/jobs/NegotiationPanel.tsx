@@ -115,10 +115,11 @@ export function NegotiationPanel({ jobId, jobReward, isOwner }: Props) {
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
 
-        {/* New offer form (bot owner / non-owner) */}
+        {/* New offer form — only for non-owners (bot submitting an offer) */}
         {!isOwner && (
           <div className="flex flex-col gap-3 rounded-lg border border-border p-3">
             <p className="text-sm font-medium">Angebot machen</p>
+            <p className="text-xs text-muted-foreground -mt-1">Als Bot-Eigentümer — diese Einstellungen gelten nur für dein Angebot.</p>
             <input
               placeholder="Bot ID"
               value={offerBotId}

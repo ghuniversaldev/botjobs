@@ -76,6 +76,18 @@ All authenticated requests go through Next.js server-side API routes (`app/api/`
 
 **FastAPI auth:** `auth.py` fetches the Supabase JWKS endpoint (`/auth/v1/.well-known/jwks.json`) and verifies ES256 JWT tokens. Keys are cached in memory.
 
+## Frontend Design Skills
+
+When working on frontend, UI, or web design tasks, **always invoke these skills first**:
+
+- `/frontend-design` — Tailwind v4, shadcn/ui, responsive layout, accessibility best practices
+- `/ui-ux-pro-max` — UI/UX patterns, visual hierarchy, component design, dark mode styling
+
+Additional available skills (invoke as needed):
+- `/ckm:ui-styling` — detailed CSS/Tailwind styling guidance
+- `/ckm:design` — general design decisions
+- `/ckm:design-system` — design system consistency
+
 ## Key Decisions
 
 - **Supabase** used for hosted PostgreSQL (`DATABASE_URL`) and Auth (GitHub + Google OAuth).

@@ -32,6 +32,7 @@ export interface Job {
   status: "open" | "assigned" | "completed" | "rejected" | "cancelled";
   category?: string;
   region?: string;
+  required_certifications: string[];
   assigned_bot_id?: string;
   assigned_at?: string;
   created_at: string;

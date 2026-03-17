@@ -22,6 +22,9 @@ export default function NewJobPage() {
     reward: "",
     category: "",
     region: "",
+    required_certifications: "",
+    bot_autonomy: false,
+    max_price: "",
   });
 
   async function handleSubmit(e: React.FormEvent) {
@@ -40,12 +43,19 @@ export default function NewJobPage() {
           reward: parseFloat(form.reward),
           category: form.category || undefined,
           region: form.region || undefined,
+          required_certifications: form.required_certifications.split(",").map((s) => s.trim()).filter(Boolean),
+          bot_autonomy: form.bot_autonomy,
+          max_price: form.max_price ? parseFloat(form.max_price) : undefined,
         }),
       });
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.detail ?? "Fehler beim Erstellen");
+        const detail = data.detail;
+        const msg = Array.isArray(detail)
+          ? detail.map((e: { loc?: string[]; msg?: string }) => `${e.loc?.slice(1).join(".")}: ${e.msg}`).join(", ")
+          : (detail ?? "Fehler beim Erstellen");
+        throw new Error(msg);
       }
 
       router.push("/jobs");
@@ -129,6 +139,17 @@ export default function NewJobPage() {
             </div>
 
             <div>
+              <label className="block text-sm font-medium mb-1.5">Datenschutz-Anforderungen (kommagetrennt)</label>
+              <input
+                type="text"
+                value={form.required_certifications}
+                onChange={(e) => setForm({ ...form, required_certifications: e.target.value })}
+                placeholder="z.B. GDPR-compliant, ISO-27001, DSGVO"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
               <label className="block text-sm font-medium mb-1.5">Reward (CHF)</label>
               <input
                 type="number"
@@ -140,6 +161,35 @@ export default function NewJobPage() {
                 placeholder="25.00"
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
               />
+            </div>
+
+            <div className="rounded-lg border border-border p-4 flex flex-col gap-3">
+              <label className="flex items-center gap-2 text-sm cursor-pointer font-medium">
+                <input
+                  type="checkbox"
+                  checked={form.bot_autonomy}
+                  onChange={(e) => setForm({ ...form, bot_autonomy: e.target.checked })}
+                  className="rounded"
+                />
+                Bot-Autonomie — Angebote automatisch akzeptieren
+              </label>
+              <p className="text-xs text-muted-foreground -mt-1">
+                Wenn aktiviert, werden Bot-Angebote bis zum Maximalpreis automatisch angenommen.
+              </p>
+              {form.bot_autonomy && (
+                <div>
+                  <label className="block text-sm font-medium mb-1.5">Maximalpreis (CHF)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    step="0.01"
+                    value={form.max_price}
+                    onChange={(e) => setForm({ ...form, max_price: e.target.value })}
+                    placeholder={form.reward || "25.00"}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                  />
+                </div>
+              )}
             </div>
 
             {error && <p className="text-sm text-destructive">{error}</p>}

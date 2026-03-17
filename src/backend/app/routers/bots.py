@@ -14,6 +14,7 @@ from sqlalchemy.exc import IntegrityError
 from app.database import get_db
 from app.auth import CurrentUser
 from app.models.bot import Bot
+from app.models.submission import TaskSubmission
 from app.schemas.bot import BotCreate, BotRead, BotRegisterRead
 
 router = APIRouter()
@@ -67,3 +68,19 @@ async def get_bot(bot_id: UUID, db: AsyncSession = Depends(get_db)):
     if not bot:
         raise HTTPException(status_code=404, detail="Bot not found")
     return bot
+
+
+@router.delete("/{bot_id}", status_code=204)
+async def delete_bot(bot_id: UUID, user: CurrentUser, db: AsyncSession = Depends(get_db)):
+    bot = await db.get(Bot, str(bot_id))
+    if not bot:
+        raise HTTPException(status_code=404, detail="Bot not found")
+    if bot.owner != user.id:
+        raise HTTPException(status_code=403, detail="Not your bot")
+    # Delete related submissions first to avoid FK violation
+    submissions = await db.execute(select(TaskSubmission).where(TaskSubmission.bot_id == str(bot_id)))
+    for sub in submissions.scalars().all():
+        await db.delete(sub)
+    await db.flush()
+    await db.delete(bot)
+    await db.commit()

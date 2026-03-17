@@ -26,6 +26,12 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify({ ...body, owner: session.user.id }),
   });
 
-  const data = await res.json();
+  const text = await res.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = { detail: `Server-Fehler (${res.status}): ${text.slice(0, 200)}` };
+  }
   return NextResponse.json(data, { status: res.status });
 }
