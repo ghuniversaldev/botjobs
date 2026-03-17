@@ -6,15 +6,29 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import type { Submission } from "@/lib/api";
 import { SubmitJobForm } from "@/components/jobs/SubmitJobForm";
 import { NegotiationPanel } from "@/components/jobs/NegotiationPanel";
+import { ValidationPanel } from "@/components/jobs/ValidationPanel";
+import { RatingForm } from "@/components/jobs/RatingForm";
 import { createClient } from "@/lib/supabase-server";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 const STATUS_STYLES: Record<string, string> = {
   open:      "bg-green-900 text-green-300",
   assigned:  "bg-yellow-900 text-yellow-300",
   completed: "bg-blue-900 text-blue-300",
+  rejected:  "bg-red-900 text-red-300",
   cancelled: "bg-gray-800 text-gray-400",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  open:      "Offen",
+  assigned:  "Vergeben",
+  completed: "Abgeschlossen",
+  rejected:  "Abgelehnt",
+  cancelled: "Abgebrochen",
 };
 
 interface Props {
@@ -32,8 +46,26 @@ export default async function JobDetailPage({ params }: Props) {
   }
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const isOwner = !!user && (job as { owner_id?: string }).owner_id === user.id;
+  const { data: { user, session } } = await supabase.auth.getUser().then(async (u) => {
+    const s = await supabase.auth.getSession();
+    return { data: { user: u.data.user, session: s.data.session } };
+  });
+
+  const isOwner = !!user && job.owner_id === user.id;
+
+  // Fetch submissions for the owner
+  let submissions: Submission[] = [];
+  if (isOwner && session) {
+    try {
+      const res = await fetch(`${API_URL}/jobs/${id}/submissions`, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+        cache: "no-store",
+      });
+      if (res.ok) submissions = await res.json();
+    } catch {
+      // not critical
+    }
+  }
 
   const createdAt = new Date(job.created_at).toLocaleDateString("de-CH", {
     day: "2-digit", month: "long", year: "numeric",
@@ -51,11 +83,27 @@ export default async function JobDetailPage({ params }: Props) {
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <h1 className="text-3xl font-bold leading-tight">{job.title}</h1>
         <span className={`shrink-0 self-start rounded-full px-4 py-1.5 text-sm font-medium ${STATUS_STYLES[job.status] ?? ""}`}>
-          {job.status}
+          {STATUS_LABELS[job.status] ?? job.status}
         </span>
       </div>
 
       <p className="mt-2 text-sm text-muted-foreground">Erstellt am {createdAt}</p>
+
+      {/* Category + Region badges */}
+      {(job.category || job.region) && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {job.category && (
+            <span className="rounded-full border border-indigo-500/30 bg-indigo-950/40 px-3 py-0.5 text-xs text-indigo-300">
+              {job.category}
+            </span>
+          )}
+          {job.region && (
+            <span className="rounded-full border border-border bg-muted px-3 py-0.5 text-xs text-muted-foreground">
+              {job.region}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Reward */}
       <div className="mt-6 inline-flex items-center gap-2 rounded-xl bg-indigo-950 px-5 py-3">
@@ -85,7 +133,27 @@ export default async function JobDetailPage({ params }: Props) {
         </div>
       )}
 
-      {/* Negotiation */}
+      {/* Owner: Validation Panel */}
+      {isOwner && job.status !== "cancelled" && (
+        <div className="mt-10 border-t border-border pt-8">
+          <h2 className="text-lg font-semibold mb-4">Einreichungen verwalten</h2>
+          <ValidationPanel
+            jobId={job.id}
+            submissions={submissions}
+            assignedBotId={job.assigned_bot_id}
+          />
+        </div>
+      )}
+
+      {/* Owner: Rating after completion */}
+      {isOwner && job.status === "completed" && (
+        <div className="mt-10 border-t border-border pt-8">
+          <h2 className="text-lg font-semibold mb-4">Bot bewerten</h2>
+          <RatingForm jobId={job.id} />
+        </div>
+      )}
+
+      {/* Negotiation — open to all logged-in users */}
       {job.status === "open" && user && (
         <div className="mt-10 border-t border-border pt-8">
           <h2 className="text-lg font-semibold mb-4">Preisverhandlung</h2>
@@ -93,18 +161,18 @@ export default async function JobDetailPage({ params }: Props) {
         </div>
       )}
 
-      {/* Submit */}
-      {job.status === "open" && (
+      {/* Submit — open to logged-in non-owners when job is open or assigned */}
+      {(job.status === "open" || job.status === "assigned") && user && !isOwner && (
         <div className="mt-8 border-t border-border pt-8">
           <h2 className="text-lg font-semibold mb-4">Lösung einreichen</h2>
           <SubmitJobForm jobId={job.id} />
         </div>
       )}
 
-      {job.status !== "open" && (
+      {job.status === "completed" && !isOwner && (
         <div className="mt-10 border-t border-border pt-8">
           <p className="text-muted-foreground text-sm">
-            Dieser Job ist nicht mehr offen für Einreichungen.
+            Dieser Job wurde abgeschlossen.
           </p>
         </div>
       )}

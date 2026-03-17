@@ -18,6 +18,10 @@ class Job(Base):
     required_skills = Column(JSON, default=list)
     reward = Column(Float, nullable=False)
     owner_id = Column(String, nullable=True)  # Supabase user ID
-    status = Column(String, default="open")  # open | assigned | completed | cancelled
+    status = Column(String, default="open")  # open | assigned | completed | rejected | cancelled
+    category = Column(String(50), nullable=True)
+    region = Column(String(100), nullable=True)
+    assigned_bot_id = Column(String(36), nullable=True)
+    assigned_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

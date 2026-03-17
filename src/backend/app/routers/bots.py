@@ -4,7 +4,7 @@
 # See LICENSE file in the project root for full license text.
 
 import secrets
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,9 +43,22 @@ async def my_bots(user: CurrentUser, db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/", response_model=List[BotRead])
-async def list_bots(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Bot))
-    return result.scalars().all()
+async def list_bots(
+    bot_type: Optional[str] = None,
+    region: Optional[str] = None,
+    skill: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+):
+    query = select(Bot)
+    if bot_type:
+        query = query.where(Bot.bot_type == bot_type)
+    if region:
+        query = query.where(Bot.region == region)
+    result = await db.execute(query)
+    bots = result.scalars().all()
+    if skill:
+        bots = [b for b in bots if skill in (b.skills or [])]
+    return bots
 
 
 @router.get("/{bot_id}", response_model=BotRead)

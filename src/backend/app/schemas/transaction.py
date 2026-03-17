@@ -5,18 +5,20 @@
 
 from uuid import UUID
 from datetime import datetime
-from typing import Any, Optional
 from pydantic import BaseModel
 
 
-class ActivityLogRead(BaseModel):
+class TransactionRead(BaseModel):
     id: UUID
-    user_id: str
-    job_id: Optional[str] = None
-    bot_id: Optional[str] = None
-    action: str
-    log_data: Any = None
-    timestamp: datetime
+    job_id: str
+    bot_id: str
+    payer_id: str
+    payee_id: str
+    amount: float
+    fee: float
+    net_amount: float
+    status: str
+    created_at: datetime
 
     class Config:
         from_attributes = True

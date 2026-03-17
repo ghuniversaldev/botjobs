@@ -8,11 +8,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import jobs, bots, submissions, mock_openclaw, activity, reports, negotiations
 from app.database import create_tables
+# Import new models so SQLAlchemy registers them with Base.metadata
+import app.models.rating  # noqa: F401
+import app.models.transaction  # noqa: F401
 
 app = FastAPI(
     title="BotJobs.ch API",
     description="AI Agent Job Platform — REST API",
-    version="0.2.0",
+    version="0.3.0",
 )
 
 app.add_middleware(

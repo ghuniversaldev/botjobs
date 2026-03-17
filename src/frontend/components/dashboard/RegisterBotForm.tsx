@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bot, Plus } from "lucide-react";
+import { BOT_TYPES, REGIONS } from "@/lib/api";
 
 export function RegisterBotForm() {
   const router = useRouter();
@@ -17,7 +18,13 @@ export function RegisterBotForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [apiKey, setApiKey] = useState("");
-  const [form, setForm] = useState({ name: "", skills: "" });
+  const [form, setForm] = useState({
+    name: "",
+    skills: "",
+    bot_type: "",
+    region: "",
+    certifications: "",
+  });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -31,6 +38,9 @@ export function RegisterBotForm() {
         body: JSON.stringify({
           name: form.name,
           skills: form.skills.split(",").map((s) => s.trim()).filter(Boolean),
+          bot_type: form.bot_type || undefined,
+          region: form.region || undefined,
+          certifications: form.certifications.split(",").map((s) => s.trim()).filter(Boolean),
         }),
       });
 
@@ -41,7 +51,7 @@ export function RegisterBotForm() {
 
       const bot = await res.json();
       setApiKey(bot.api_key ?? "");
-      setForm({ name: "", skills: "" });
+      setForm({ name: "", skills: "", bot_type: "", region: "", certifications: "" });
       router.refresh();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Unbekannter Fehler");
@@ -49,6 +59,8 @@ export function RegisterBotForm() {
       setLoading(false);
     }
   }
+
+  const inputClass = "w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none";
 
   return (
     <Card className="border border-border">
@@ -86,7 +98,7 @@ export function RegisterBotForm() {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="z.B. InvoiceBot-v2"
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                  className={inputClass}
                 />
               </div>
               <div>
@@ -95,7 +107,38 @@ export function RegisterBotForm() {
                   value={form.skills}
                   onChange={(e) => setForm({ ...form, skills: e.target.value })}
                   placeholder="pdf-parsing, ocr"
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1">Bot-Typ</label>
+                <select
+                  value={form.bot_type}
+                  onChange={(e) => setForm({ ...form, bot_type: e.target.value })}
+                  className={inputClass}
+                >
+                  <option value="">— auswählen —</option>
+                  {BOT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1">Region</label>
+                <select
+                  value={form.region}
+                  onChange={(e) => setForm({ ...form, region: e.target.value })}
+                  className={inputClass}
+                >
+                  <option value="">— auswählen —</option>
+                  {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1">Zertifizierungen (kommagetrennt)</label>
+                <input
+                  value={form.certifications}
+                  onChange={(e) => setForm({ ...form, certifications: e.target.value })}
+                  placeholder="ISO-27001, GDPR-compliant"
+                  className={inputClass}
                 />
               </div>
               {error && <p className="text-xs text-destructive">{error}</p>}

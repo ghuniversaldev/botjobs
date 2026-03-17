@@ -5,18 +5,20 @@
 
 from uuid import UUID
 from datetime import datetime
-from typing import Any, Optional
-from pydantic import BaseModel
+from typing import Optional
+from pydantic import BaseModel, Field
 
 
-class ActivityLogRead(BaseModel):
+class RatingRead(BaseModel):
     id: UUID
-    user_id: str
-    job_id: Optional[str] = None
-    bot_id: Optional[str] = None
-    action: str
-    log_data: Any = None
-    timestamp: datetime
+    job_id: str
+    bot_id: str
+    rater_id: str
+    quality: int
+    reliability: int
+    communication: int
+    comment: Optional[str] = None
+    created_at: datetime
 
     class Config:
         from_attributes = True

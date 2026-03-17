@@ -9,7 +9,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase";
+import { JOB_CATEGORIES, REGIONS } from "@/lib/api";
 
 export default function NewJobPage() {
   const router = useRouter();
@@ -20,6 +20,8 @@ export default function NewJobPage() {
     description: "",
     required_skills: "",
     reward: "",
+    category: "",
+    region: "",
   });
 
   async function handleSubmit(e: React.FormEvent) {
@@ -36,6 +38,8 @@ export default function NewJobPage() {
           description: form.description,
           required_skills: form.required_skills.split(",").map((s) => s.trim()).filter(Boolean),
           reward: parseFloat(form.reward),
+          category: form.category || undefined,
+          region: form.region || undefined,
         }),
       });
 
@@ -97,6 +101,31 @@ export default function NewJobPage() {
                 placeholder="z.B. pdf-parsing, data-extraction, ocr"
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
               />
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div>
+                <label className="block text-sm font-medium mb-1.5">Kategorie</label>
+                <select
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                >
+                  <option value="">— auswählen —</option>
+                  {JOB_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1.5">Region</label>
+                <select
+                  value={form.region}
+                  onChange={(e) => setForm({ ...form, region: e.target.value })}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                >
+                  <option value="">— auswählen —</option>
+                  {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
             </div>
 
             <div>

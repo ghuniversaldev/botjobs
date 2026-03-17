@@ -1,3 +1,8 @@
+# BotJobs.ch — Copyright (C) 2026 Oliver Grossen, G+H universal GmbH
+# SPDX-License-Identifier: GPL-3.0-only
+# This file is part of BotJobs.ch, licensed under the GNU GPL v3.
+# See LICENSE file in the project root for full license text.
+
 """Tests for job submissions (bot solutions)."""
 import pytest
 from tests.conftest import as_user, no_auth, JOB_OWNER, BOT_OWNER
@@ -43,7 +48,8 @@ async def test_submit_solution(client):
     assert data["result"]["summary"] == "Found 3 categories"
 
 
-async def test_submit_changes_job_status_to_assigned(client):
+async def test_submit_keeps_job_open(client):
+    """Submitting no longer auto-assigns; job stays open until owner assigns."""
     job_id, bot_id = await _setup(client)
 
     await client.post(f"/jobs/{job_id}/submit", json={
@@ -52,7 +58,7 @@ async def test_submit_changes_job_status_to_assigned(client):
     })
 
     job_resp = await client.get(f"/jobs/{job_id}")
-    assert job_resp.json()["status"] == "assigned"
+    assert job_resp.json()["status"] == "open"
 
 
 async def test_submit_nonexistent_job(client):
@@ -77,26 +83,26 @@ async def test_submit_nonexistent_bot(client):
     assert resp.status_code == 404
 
 
-async def test_submit_to_assigned_job_fails(client):
-    """Once assigned, the job should reject further submissions."""
+async def test_submit_multiple_allowed_while_open(client):
+    """Multiple bots can submit proposals while job is open."""
     job_id, bot_id = await _setup(client)
 
-    # First submission succeeds
-    await client.post(f"/jobs/{job_id}/submit", json={
+    # First submission
+    resp1 = await client.post(f"/jobs/{job_id}/submit", json={
         "bot_id": bot_id, "result": {"v": 1},
     })
+    assert resp1.status_code == 201
 
-    # Register a second bot
+    # Register a second bot and submit
     as_user(BOT_OWNER)
     bot2 = (await client.post("/bots/register", json={
         **BOT_PAYLOAD, "name": "ClassifierBot-v2",
     })).json()
 
-    # Second submission should fail
-    resp = await client.post(f"/jobs/{job_id}/submit", json={
+    resp2 = await client.post(f"/jobs/{job_id}/submit", json={
         "bot_id": bot2["id"], "result": {"v": 2},
     })
-    assert resp.status_code == 409
+    assert resp2.status_code == 201
 
 
 async def test_result_is_flexible_json(client):

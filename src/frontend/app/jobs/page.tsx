@@ -13,13 +13,16 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase-server";
 
 interface Props {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; category?: string; region?: string }>;
 }
 
-async function JobList({ status, currentUserId }: { status?: string; currentUserId?: string }) {
+async function JobList({ status, category, currentUserId }: { status?: string; category?: string; currentUserId?: string }) {
   let jobs = [];
   try {
-    jobs = await api.jobs.list(status === "all" ? undefined : status);
+    jobs = await api.jobs.list({
+      status: status === "all" ? undefined : status,
+      category: category || undefined,
+    });
   } catch {
     return (
       <p className="text-destructive text-sm">
@@ -49,7 +52,7 @@ async function JobList({ status, currentUserId }: { status?: string; currentUser
 }
 
 export default async function JobsPage({ searchParams }: Props) {
-  const { status } = await searchParams;
+  const { status, category } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -80,7 +83,7 @@ export default async function JobsPage({ searchParams }: Props) {
           ))}
         </div>
       }>
-        <JobList status={status} currentUserId={user?.id} />
+        <JobList status={status} category={category} currentUserId={user?.id} />
       </Suspense>
     </main>
   );

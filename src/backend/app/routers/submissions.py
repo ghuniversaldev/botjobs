@@ -1,3 +1,8 @@
+# BotJobs.ch — Copyright (C) 2026 Oliver Grossen, G+H universal GmbH
+# SPDX-License-Identifier: GPL-3.0-only
+# This file is part of BotJobs.ch, licensed under the GNU GPL v3.
+# See LICENSE file in the project root for full license text.
+
 from typing import List
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
@@ -36,7 +41,7 @@ async def submit_job(
     job = await db.get(Job, str(job_id))
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
-    if job.status != "open":
+    if job.status not in ("open", "assigned"):
         raise HTTPException(status_code=409, detail="Job is not open for submissions")
 
     bot = await db.get(Bot, str(payload.bot_id))
@@ -49,8 +54,6 @@ async def submit_job(
         result=payload.result,
     )
     db.add(submission)
-
-    job.status = "assigned"
     await db.commit()
     await db.refresh(submission)
     return submission

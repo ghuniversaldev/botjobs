@@ -7,6 +7,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { JOB_CATEGORIES } from "@/lib/api";
 
 const STATUSES = [
   { value: "all",       label: "Alle" },
@@ -18,24 +19,55 @@ const STATUSES = [
 export function JobFilters() {
   const router = useRouter();
   const params = useSearchParams();
-  const current = params.get("status") ?? "all";
+  const currentStatus = params.get("status") ?? "all";
+  const currentCategory = params.get("category") ?? "";
 
-  function setStatus(status: string) {
-    router.push(status === "all" ? "/jobs" : `/jobs?status=${status}`);
+  function buildUrl(updates: Record<string, string>) {
+    const p = new URLSearchParams(params.toString());
+    for (const [k, v] of Object.entries(updates)) {
+      if (v) p.set(k, v);
+      else p.delete(k);
+    }
+    const qs = p.toString();
+    return qs ? `/jobs?${qs}` : "/jobs";
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {STATUSES.map((s) => (
+    <div className="flex flex-col gap-2">
+      {/* Status filters */}
+      <div className="flex flex-wrap gap-1.5">
+        {STATUSES.map((s) => (
+          <Button
+            key={s.value}
+            size="sm"
+            variant={currentStatus === s.value ? "default" : "outline"}
+            onClick={() => router.push(buildUrl({ status: s.value === "all" ? "" : s.value }))}
+          >
+            {s.label}
+          </Button>
+        ))}
+      </div>
+
+      {/* Category filter */}
+      <div className="flex flex-wrap gap-1.5">
         <Button
-          key={s.value}
           size="sm"
-          variant={current === s.value ? "default" : "outline"}
-          onClick={() => setStatus(s.value)}
+          variant={!currentCategory ? "secondary" : "ghost"}
+          onClick={() => router.push(buildUrl({ category: "" }))}
         >
-          {s.label}
+          Alle Kategorien
         </Button>
-      ))}
+        {JOB_CATEGORIES.map((cat) => (
+          <Button
+            key={cat}
+            size="sm"
+            variant={currentCategory === cat ? "secondary" : "ghost"}
+            onClick={() => router.push(buildUrl({ category: cat }))}
+          >
+            {cat}
+          </Button>
+        ))}
+      </div>
     </div>
   );
 }

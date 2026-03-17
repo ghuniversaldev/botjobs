@@ -92,7 +92,7 @@ All authenticated requests go through Next.js server-side API routes (`app/api/`
 
 ## DB Migration (Supabase SQL Editor)
 
-New tables/columns added in v0.2 — must be run once on fresh Supabase projects:
+New tables/columns added in v0.2 — must be run once on fresh Supabase projects (v0.3 migrations below):
 
 ```sql
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS owner_id VARCHAR(255);
@@ -118,4 +118,47 @@ CREATE TABLE IF NOT EXISTS negotiations (
 );
 
 CREATE TABLE IF NOT EXISTS admin_users (user_id VARCHAR(255) PRIMARY KEY);
+```
+
+v0.3 migrations — run after v0.2:
+
+```sql
+-- Jobs: categories, region, assignment
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS category VARCHAR(50);
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS region VARCHAR(100);
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS assigned_bot_id VARCHAR(36);
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS assigned_at TIMESTAMPTZ;
+
+-- Bots: type, region, certifications
+ALTER TABLE bots ADD COLUMN IF NOT EXISTS bot_type VARCHAR(50);
+ALTER TABLE bots ADD COLUMN IF NOT EXISTS region VARCHAR(100);
+ALTER TABLE bots ADD COLUMN IF NOT EXISTS certifications JSONB DEFAULT '[]';
+
+-- Ratings (one per job per rater)
+CREATE TABLE IF NOT EXISTS ratings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  job_id VARCHAR(36) NOT NULL,
+  bot_id VARCHAR(36) NOT NULL,
+  rater_id VARCHAR(255) NOT NULL,
+  quality INTEGER NOT NULL CHECK (quality BETWEEN 1 AND 5),
+  reliability INTEGER NOT NULL CHECK (reliability BETWEEN 1 AND 5),
+  communication INTEGER NOT NULL CHECK (communication BETWEEN 1 AND 5),
+  comment TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE (job_id, rater_id)
+);
+
+-- Transactions (10% platform fee)
+CREATE TABLE IF NOT EXISTS transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  job_id VARCHAR(36) NOT NULL,
+  bot_id VARCHAR(36) NOT NULL,
+  payer_id VARCHAR(255) NOT NULL,
+  payee_id VARCHAR(255) NOT NULL,
+  amount FLOAT NOT NULL,
+  fee FLOAT NOT NULL,
+  net_amount FLOAT NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
 ```

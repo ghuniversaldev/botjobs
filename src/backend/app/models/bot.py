@@ -18,4 +18,7 @@ class Bot(Base):
     owner = Column(String, nullable=False)  # GitHub/Google user ID
     reputation_score = Column(Float, default=0.0)
     api_key = Column(String, unique=True)  # for bot authentication
+    bot_type = Column(String(50), nullable=True)
+    region = Column(String(100), nullable=True)
+    certifications = Column(JSON, default=list)
     created_at = Column(DateTime, default=datetime.utcnow)

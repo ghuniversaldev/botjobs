@@ -12,6 +12,7 @@ from app.auth import CurrentUser
 from app.models.job import Job
 from app.models.bot import Bot
 from app.models.submission import TaskSubmission
+from app.models.transaction import Transaction
 from app.models.admin_user import AdminUser
 from app.schemas.job import JobRead
 from app.schemas.bot import BotRead
@@ -46,6 +47,18 @@ async def user_metrics(user: CurrentUser, db: AsyncSession = Depends(get_db)):
 
     completed_jobs = [j for j in jobs if j.status == "completed"]
 
+    # spending: sum of transactions where user is payer
+    spending_result = await db.execute(
+        select(func.sum(Transaction.amount)).where(Transaction.payer_id == user.id)
+    )
+    total_spending = spending_result.scalar() or 0.0
+
+    # earnings: sum of net_amount for transactions where user's bots are payees
+    earnings_result = await db.execute(
+        select(func.sum(Transaction.net_amount)).where(Transaction.payee_id == user.id)
+    )
+    total_earnings = earnings_result.scalar() or 0.0
+
     return {
         "jobs_total": len(jobs),
         "jobs_open": len([j for j in jobs if j.status == "open"]),
@@ -54,6 +67,8 @@ async def user_metrics(user: CurrentUser, db: AsyncSession = Depends(get_db)):
         "submissions_total": len(submissions),
         "submissions_accepted": len(accepted),
         "success_rate": success_rate,
+        "total_spending": round(total_spending, 2),
+        "total_earnings": round(total_earnings, 2),
     }
 
 

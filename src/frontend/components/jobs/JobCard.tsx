@@ -43,6 +43,11 @@ export function JobCard({ job, currentUserId }: { job: Job; currentUserId?: stri
           <p className="text-sm text-muted-foreground line-clamp-2">{job.description}</p>
 
           <div className="flex flex-wrap gap-1.5">
+            {job.category && (
+              <Badge variant="outline" className="text-xs font-normal text-indigo-400 border-indigo-500/40">
+                {job.category}
+              </Badge>
+            )}
             {job.required_skills.slice(0, 3).map((skill) => (
               <Badge key={skill} variant="outline" className="text-xs font-normal">
                 {skill}
