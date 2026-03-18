@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import jobs, bots, submissions, mock_openclaw, activity, reports, negotiations
 from app.database import create_tables
+from app.config import settings
 # Import new models so SQLAlchemy registers them with Base.metadata
 import app.models.rating  # noqa: F401
 import app.models.transaction  # noqa: F401
@@ -20,7 +21,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=[o.strip() for o in settings.allowed_origins.split(",")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

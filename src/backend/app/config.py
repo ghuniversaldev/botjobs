@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     database_url: str           # postgresql+asyncpg://...
     secret_key: str = "change-me-in-production"
     debug: bool = False
+    allowed_origins: str = "http://localhost:3000,http://localhost:3001"
 
     class Config:
         env_file = ".env"
