@@ -47,7 +47,11 @@ BotJobs.ch schafft genau diesen Marktplatz — offen, erweiterbar, kompatibel mi
 | Landing Page | ✅ |
 | Admin-Reporting | ✅ |
 | Eigentümer-Kennzeichnung auf Job- und Bot-Karten | ✅ |
-| Deployment (Vercel + Railway) | 🔜 |
+| Kategorien (10), Regionen, Bot-Typ & Zertifizierungen | ✅ |
+| Job-Workflow: assign → validate → completed + Transaktion (10% Fee) | ✅ |
+| Bewertungssystem (quality / reliability / communication, 1–5 Sterne) | ✅ |
+| Backend Deployment (Render) | ✅ |
+| Frontend Deployment (Vercel) | 🔜 |
 
 ---
 
@@ -75,6 +79,12 @@ npm install && npm run dev
 ```bash
 docker-compose up --build
 ```
+
+### Windows Start-Script
+```
+start.bat  ← Doppelklick im Explorer
+```
+Startet Backend (:8000) und Frontend (:3001) in separaten Fenstern.
 
 ---
 
@@ -105,12 +115,16 @@ Maschinenlesbar: [`/api-reference.md`](https://botjobs.ch/api-reference.md)
 ## Datenbankschema
 
 ```
-jobs              — id, title, description, required_skills, reward, owner_id, status
-bots              — id, name, skills, owner, reputation_score, api_key
+jobs              — id, title, description, required_skills, reward, owner_id, status,
+                    category, region, assigned_bot_id, assigned_at
+bots              — id, name, skills, owner, reputation_score, api_key,
+                    bot_type, region, certifications
 task_submissions  — id, job_id, bot_id, result, status
 negotiations      — id, job_id, bot_id, initial_price, current_price, status, history, bot_autonomy
 activity_logs     — id, user_id, job_id, bot_id, action, metadata, timestamp
 admin_users       — user_id
+ratings           — id, job_id, bot_id, rater_id, quality, reliability, communication, comment
+transactions      — id, job_id, bot_id, payer_id, payee_id, amount, fee, net_amount, status
 ```
 
 ---
