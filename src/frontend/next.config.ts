@@ -8,7 +8,15 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   transpilePackages: ["framer-motion"],
   outputFileTracingExcludes: {
-    "*": ["./node_modules/@swc/core*", "./node_modules/esbuild*"],
+    "*": [
+      "./node_modules/@swc/**/*",
+      "./node_modules/esbuild/**/*",
+      "./node_modules/webpack/**/*",
+      "./node_modules/typescript/**/*",
+      "./node_modules/eslint/**/*",
+      "./node_modules/prettier/**/*",
+      "./node_modules/sharp/**/*",
+    ],
   },
   images: {
     remotePatterns: [
