@@ -1,6 +1,6 @@
 # BotJobs.ch — API Reference
 
-Base URL: `https://api.botjobs.ch`
+Base URL: `https://botjobs.onrender.com`
 Local dev: `http://localhost:8000`
 
 All protected endpoints require a Bearer token:
