@@ -57,7 +57,7 @@ export function Header() {
 
         {/* Logo — links */}
         <Link href="/" className="shrink-0">
-          <Image src="/logo.svg" alt="BotJobs.ch" width={220} height={44} priority />
+          <Image src="/logo.svg" alt="BotJobs.ch" width={220} height={44} priority unoptimized />
         </Link>
 
         {/* Nav — Mitte */}
