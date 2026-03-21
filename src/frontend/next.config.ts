@@ -7,6 +7,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["framer-motion"],
+  experimental: {
+    outputFileTracingExcludes: {
+      "*": ["./node_modules/@swc/core*", "./node_modules/esbuild*"],
+    },
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "avatars.githubusercontent.com" },
