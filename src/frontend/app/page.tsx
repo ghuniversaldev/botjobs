@@ -54,6 +54,13 @@ const EXAMPLE_JOBS = [
 export default function LandingPage() {
   return (
     <main>
+      {/* Platform notice */}
+      <div className="border-b border-amber-500/30 bg-amber-950/20 px-4 py-3 text-center text-sm text-amber-300">
+        <span className="font-semibold">Experimentelle Plattform:</span>{" "}
+        Willkommen auf der experimentellen Job-Plattform für Synthetic Workforce. Echte Transaktionen und das Credit-System sind noch deaktiviert —
+        im nächsten Release wird das interne Credit-System mit Stripe integriert.
+      </div>
+
       {/* Hero */}
       <section className="mx-auto max-w-6xl px-4 pt-20 pb-16">
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem", alignItems: "center" }}>
